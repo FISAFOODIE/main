@@ -10,7 +10,7 @@ load_dotenv()
 host = os.getenv('DB_HOST')
 user = os.getenv('DB_USER')
 password = os.getenv('DB_PASSWORD')
-port = int(os.getenv('DB_PORT', 3306))  # 기본 포트는 3306
+port = int(os.getenv('DB_PORT', 3306))
 database_name = os.getenv('DB_NAME')
 
 # MySQL 연결 설정

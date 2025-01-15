@@ -6,3 +6,5 @@ create_table_app = st.Page("create_table_app.py", title="Create Table with CSV f
 pg = st.navigation([query_app, create_table_app])
 
 pg.run()
+
+# 야야ya

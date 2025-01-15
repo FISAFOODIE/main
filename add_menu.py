@@ -3,6 +3,7 @@ import streamlit as st
 import pymysql
 from dotenv import load_dotenv
 import os
+import time
 
 # .env 파일 로드
 load_dotenv()
@@ -25,9 +26,14 @@ def connect_db():
         database=database_name
     )
 
+st.set_page_config(
+    page_title="FISAFOODIE",
+    page_icon="🧊"
+)
 
 # 제목
-st.title("점메츄 - 메뉴 관리")
+st.title(":knife_fork_plate: :rainbow[점메츄] - 메뉴 관리:knife_fork_plate:")
+st.divider()
 
 # 데이터베이스 설정
 table_name = "restaurant_reviews"  # 실제 테이블 이름으로 변경
@@ -36,16 +42,39 @@ table_name = "restaurant_reviews"  # 실제 테이블 이름으로 변경
 st.divider()
 
 # 새로운 메뉴 추가 섹션
-st.subheader("오늘 점심으로 무엇을 드셨나요?")
+st.subheader("오늘 :rainbow[점심]으로 무엇을 드셨나요?")
+st.write('')
+st.write('')
+st.write('')
+sex_ = st.radio("성별을 선택해주세요", ["남", "여"])
+st.divider()
 
-sex_ = st.radio("성별을 입력해주세요", ["M", "F"])
-class_ = st.radio("트랙을 입력해주세요", ["ai_엔지니어링", "클라우드 서비스", "클라우드 엔지니어링"])
+class_ = st.selectbox("트랙을 선택해주세요", ["ai_엔지니어링", "클라우드 서비스", "클라우드 엔지니어링"])
+st.divider()
+
 restaurant_name_ = st.text_input("방문한 식당을 입력해주세요")
+st.divider()
+
+# st.write('') # 줄 띄우기
+# if st.button('눈 그만') == False: # 창에 눈 날리기
+#     st.snow()
+
+# if st.button('풍선 그만') == False: # 창에 풍선 날리기
+#     st.balloons()
+
 menu_ = st.text_input("메뉴명을 입력해주세요 (여러가지 메뉴를 드셨다면 ','으로 구분 ex) 짜장면, 탕수육)")
+st.divider()
 photo_ = st.file_uploader("사진 파일을 업로드해주세요")
+st.divider()
 price_ = st.radio("가격대를 입력해주세요", ["5000원 미만", "5000원 ~ 8000원미만", "8000원 ~ 11000원미만", "11000원 ~ 14000원 미만", "14000원 이상"])
-taste_ = st.slider("음식의 맛은 어땠나요? (1 - 별로, 5 - 아주 좋음)", 1, 5)
-accessibility_ = st.slider("식당 접근성은 어땠나요? (1 - 불편, 5 - 아주 편리)", 1, 5)
+st.divider()
+st.text("음식은 어떠셨나요?")
+taste_ = st.feedback(key="taste", options="stars")
+st.divider()
+st.text("식당 위치는 어떠셨나요? (거리, 횡단보도 건넌 횟수, 엘레베이터 여부)")
+accessibility_ = st.feedback(key="accessibility",options="stars")
+
+st.divider()
 
 # 데이터 삽입 버튼
 if st.button("Add Menu Item"):

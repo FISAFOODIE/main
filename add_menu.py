@@ -12,6 +12,7 @@ user = os.getenv('DB_USER')
 password = os.getenv('DB_PASSWORD')
 port = int(os.getenv('DB_PORT', 3306))  # 기본 포트는 3306
 database_name = os.getenv('DB_NAME')
+
 # MySQL 연결 설정
 def connect_db():
     return pymysql.connect(
@@ -50,7 +51,7 @@ def set_bg_hack(main_bg): # background
     )
 
 
-set_bg_hack(r"C:\Users\jimin\Desktop\fisafoodie\main\bg.png")
+set_bg_hack(r"bg.png")
 
 
 st.markdown(
@@ -122,8 +123,8 @@ st.markdown(
 
 
 # 제목
-st.markdown("<div class='title'>🍴 점메츄 - 메뉴 관리 🍴</div>", unsafe_allow_html=True)
-st.markdown("<div class='sub-title'>FISA 아카데미 학생들을 위한 특별한 맛집 관리 플랫폼</div>", unsafe_allow_html=True)
+st.markdown("<div class='title'>🍴 점메츄 프로젝트 🍴</div>", unsafe_allow_html=True)
+st.markdown("<div class='sub-title'>FISA 아카데미 학생들을 위한 맛집 찾기 페이지</div>", unsafe_allow_html=True)
 st.divider()
 
 
@@ -133,7 +134,11 @@ table_name = "restaurant_reviews"  # 실제 테이블 이름으로 변경
 # 초기 데이터 로드 (여기서는 이미 데이터베이스가 존재한다고 가정)
 
 # 새로운 메뉴 추가 섹션
-st.subheader("오늘 :rainbow[점심]으로 무엇을 드셨나요?")
+st.subheader("오늘 :rainbow[점심]으로 무엇을 드셨는지 알려주세요 !")
+st.divider()
+
+st.markdown('<div class="custom-text">❤ 폰 번호 뒷자리를 알려주시면 각 반에 1명씩 추첨하여 매머드 깊티를 드려요 ❤ </div>', unsafe_allow_html=True)
+phone_num = st.text_input("")
 st.divider()
 
 st.markdown('<div class="custom-text">👩👦 성별을 선택해주세요! </div>', unsafe_allow_html=True)
@@ -145,7 +150,7 @@ class_ = st.selectbox("", ["ai_엔지니어링", "클라우드 서비스", "클�
 st.divider()
 
 st.markdown('<div class="custom-text">🍕 방문한 식당은 어디세요? </div>', unsafe_allow_html=True)
-restaurant_name_ = st.text_input("")
+restaurant_name_ = st.text_input("", key="restaurant_name")
 st.divider()
 
 # st.write('') # 줄 띄우기
@@ -157,16 +162,15 @@ st.divider()
 
 st.markdown('<div class="custom-text">🍔 어떤 메뉴를 드셨나요? </div>', unsafe_allow_html=True)
 menu_ = st.text_input("(여러가지 메뉴를 드셨다면 ','으로 구분 ex) 짜장면, 탕수육)")
-st.divider()
-
-st.markdown('<div class="custom-text">📷 사진이 있다면 올려주시겠어요? </div>', unsafe_allow_html=True)
-photo_ = st.file_uploader("")
-# photo_ = st.file_uploader("사진 파일을 업로드해주세요")
 
 st.divider()
 st.markdown('<div class="custom-text">💰 가격은 얼마였나요? </div>', unsafe_allow_html=True)
 # price_ = st.radio("가격대를 입력해주세요", ["5000원 미만", "5000원 ~ 8000원미만", "8000원 ~ 11000원미만", "11000원 ~ 14000원 미만", "14000원 이상"])
 price_ = st.radio("", ["5000원 미만", "5000원 ~ 8000원미만", "8000원 ~ 11000원미만", "11000원 ~ 14000원 미만", "14000원 이상"])
+
+st.divider()
+st.markdown('<div class="custom-text">🍕 식사하신 날짜는 언제인가요? </div>', unsafe_allow_html=True)
+date_ = st.date_input("", format="YYYY-MM-DD")
 
 st.divider()
 st.markdown('<div class="custom-text">🍔 음식은 어떠셨나요? </div>', unsafe_allow_html=True)
@@ -178,31 +182,33 @@ accessibility_ = st.feedback(key="accessibility",options="stars")
 
 st.divider()
 
-# 데이터 삽입 버튼
-if st.button("Add Menu Item"):
+if st.button("등록"):
     try:
         # MySQL 연결
         connection = connect_db()
         cursor = connection.cursor()
 
         # 입력 데이터 준비
-        menu_item = menu_
-        price_item = price_
         sex_item = sex_
         class_item = class_
         restaurant_name_item = restaurant_name_
-        taste_item = taste_
-        accessibility_item = accessibility_
+        menu_item = menu_
+        price_item = price_  # 가격대 선택값
+        taste_item = taste_  # 별점
+        accessibility_item = accessibility_  # 별점
+        date_item = date_  # 선택한 날짜
+        phone_item = phone_num  # 전화번호
 
         # 쿼리 작성
         insert_query = f"""
-        INSERT INTO {table_name} (sex, class, restaurant_name, menu, picture, cost, flavor, accessibility)
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+        INSERT INTO {table_name} (sex, class, restaurant_name, menu, cost, flavor, accessibility, date, phone_num)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
         """
 
         # 데이터 삽입
         cursor.execute(insert_query, (
-            sex_item, class_item, restaurant_name_item, menu_item, None, price_item, taste_item, accessibility_item
+            sex_item, class_item, restaurant_name_item, menu_item, price_item,
+            taste_item, accessibility_item, date_item, phone_item
         ))
 
         # 커밋 및 성공 메시지

@@ -213,10 +213,7 @@ if st.button("등록"):
 
         # 커밋 및 성공 메시지
         connection.commit()
-        st.success(f"'{menu_item}'가 성공적으로 추가되었습니다.")
-        
-        # 페이지 새로고침
-        st.experimental_rerun()
+        st.success("등록 성공! 새로고침 후 등록해주세요.")
 
     except Exception as e:
         # 오류 발생 시 롤백

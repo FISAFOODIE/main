@@ -7,6 +7,7 @@ import base64
 
 # .env 파일 로드
 load_dotenv()
+
 # .env 파일에서 MySQL 연결 정보 가져오기
 host = os.getenv('DB_HOST')
 user = os.getenv('DB_USER')
@@ -96,13 +97,6 @@ st.markdown('<div class="custom-text">🏡 방문한 식당은 어디세요? </d
 restaurant_name_ = st.text_input("", key="restaurant_name")
 st.divider()
 
-# st.write('') # 줄 띄우기
-# if st.button('눈 그만') == False: # 창에 눈 날리기
-#     st.snow()
-
-# if st.button('풍선 그만') == False: # 창에 풍선 날리기
-#     st.balloons()
-
 st.markdown('<div class="custom-text">🍔 어떤 메뉴를 드셨나요? </div>', unsafe_allow_html=True)
 menu_ = st.text_input("(여러가지 메뉴를 드셨다면 ','으로 구분 ex) 짜장면, 탕수육)")
 
@@ -124,6 +118,25 @@ accessibility_ = st.feedback(key="accessibility", options="stars")
 
 st.divider()
 
+# 사진 업로드
+st.markdown('<div class="custom-text">📸 식사 후 사진을 업로드 해주세요! </div>', unsafe_allow_html=True)
+uploaded_image = st.file_uploader("이미지 파일을 업로드 해주세요", type=["png", "jpg", "jpeg"])
+
+# 이미지를 바이너리로 저장할 함수
+def image_to_binary(img):
+    return img.read()
+
+# 업로드된 이미지가 있으면 바이너리로 변환, 없으면 None을 저장
+if uploaded_image is not None:
+    image_data = image_to_binary(uploaded_image)
+else:
+    image_data = None  # 이미지가 없으면 None으로 설정
+
+# '맛 평점'이 비어있으면 기본값(1)을 설정
+taste_item = taste_ if taste_ else 1  # 기본값을 1로 설정 (원하는 값으로 변경 가능)
+
+st.divider()
+
 if st.button("등록"):
     try:
         # MySQL 연결
@@ -136,21 +149,22 @@ if st.button("등록"):
         restaurant_name_item = restaurant_name_
         menu_item = menu_
         price_item = price_  # 가격대 선택값
-        taste_item = taste_  # 별점
-        accessibility_item = accessibility_  # 별점
+        picture_item = image_data  # 이미지 바이너리 데이터 (이미지가 없으면 None)
+        flavor_item = taste_item  # 맛 평점
+        accessibility_item = accessibility_  # 접근성 평점
         date_item = date_  # 선택한 날짜
         phone_item = phone_num  # 전화번호
 
         # 쿼리 작성
         insert_query = f"""
-        INSERT INTO {table_name} (sex, class, restaurant_name, menu, cost, flavor, accessibility, date, phone_num)
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+        INSERT INTO {table_name} (sex, class, restaurant_name, menu, cost, flavor, picture, accessibility, date, phone_num)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         """
 
         # 데이터 삽입
         cursor.execute(insert_query, (
             sex_item, class_item, restaurant_name_item, menu_item, price_item,
-            taste_item, accessibility_item, date_item, phone_item
+            flavor_item, picture_item, accessibility_item, date_item, phone_item
         ))
 
         # 커밋 및 성공 메시지

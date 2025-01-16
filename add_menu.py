@@ -1,4 +1,3 @@
-
 import streamlit as st
 import pymysql
 from dotenv import load_dotenv
@@ -44,8 +43,7 @@ st.divider()
 # 새로운 메뉴 추가 섹션
 st.subheader("오늘 :rainbow[점심]으로 무엇을 드셨나요?")
 st.write('')
-st.write('')
-st.write('')
+
 sex_ = st.radio("성별을 선택해주세요", ["남", "여"])
 st.divider()
 
@@ -55,24 +53,21 @@ st.divider()
 restaurant_name_ = st.text_input("방문한 식당을 입력해주세요")
 st.divider()
 
-# st.write('') # 줄 띄우기
-# if st.button('눈 그만') == False: # 창에 눈 날리기
-#     st.snow()
-
-# if st.button('풍선 그만') == False: # 창에 풍선 날리기
-#     st.balloons()
-
 menu_ = st.text_input("메뉴명을 입력해주세요 (여러가지 메뉴를 드셨다면 ','으로 구분 ex) 짜장면, 탕수육)")
 st.divider()
-photo_ = st.file_uploader("사진 파일을 업로드해주세요")
+
+photo_ = st.file_uploader("사진 파일을 업로드해주세요", type=["jpg", "jpeg", "png"])  # 확장자 제한
 st.divider()
+
 price_ = st.radio("가격대를 입력해주세요", ["5000원 미만", "5000원 ~ 8000원미만", "8000원 ~ 11000원미만", "11000원 ~ 14000원 미만", "14000원 이상"])
 st.divider()
+
 st.text("음식은 어떠셨나요?")
 taste_ = st.feedback(key="taste", options="stars")
 st.divider()
+
 st.text("식당 위치는 어떠셨나요? (거리, 횡단보도 건넌 횟수, 엘레베이터 여부)")
-accessibility_ = st.feedback(key="accessibility",options="stars")
+accessibility_ = st.feedback(key="accessibility", options="stars")
 
 st.divider()
 
@@ -92,6 +87,15 @@ if st.button("Add Menu Item"):
         taste_item = taste_
         accessibility_item = accessibility_
 
+        # 사진이 업로드된 경우 BLOB으로 처리
+        if photo_ is not None:
+            # 사진을 바이너리로 읽기
+            photo_binary = photo_.read()
+            # 바이너리 데이터가 제대로 들어갔는지 확인 (디버깅용)
+            st.write(f"파일 크기: {len(photo_binary)} bytes")  # 바이너리 크기 출력
+        else:
+            photo_binary = None  # 사진이 없을 경우 None 처리
+
         # 쿼리 작성
         insert_query = f"""
         INSERT INTO {table_name} (sex, class, restaurant_name, menu, picture, cost, flavor, accessibility)
@@ -100,7 +104,7 @@ if st.button("Add Menu Item"):
 
         # 데이터 삽입
         cursor.execute(insert_query, (
-            sex_item, class_item, restaurant_name_item, menu_item, None, price_item, taste_item, accessibility_item
+            sex_item, class_item, restaurant_name_item, menu_item, photo_binary, price_item, taste_item, accessibility_item
         ))
 
         # 커밋 및 성공 메시지

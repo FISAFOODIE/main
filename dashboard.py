@@ -26,7 +26,8 @@ def connect_db():
 
 st.set_page_config( # 항상 제일 먼저
     page_title="FISAFOODIE",
-    page_icon="🍽"
+    page_icon="🍽",
+    layout="wide"
 )
 
 def set_bg_hack(main_bg): # background
@@ -111,7 +112,7 @@ def plot_taste_rank(df):
     # 'restaurant_name'으로 그룹화 -> 'flavor'의 평균 계산 -> 내림차순 정렬 -> 10개만 슬라이싱
     df_taste_rank = df.groupby('restaurant_name')['flavor'].mean().sort_values(ascending=False).reset_index()[:10]
     # 'restaurant_name'에서 공백 기준으로 줄바꿈 -> '상호명 줄바꾸기'
-    df_taste_rank['restaurant_name_줄바꿈'] = df_taste_rank['restaurant_name'].apply(lambda name: "<br>".join(name.split(" ")))
+    df_taste_rank['restaurant_name_줄바꿈'] = df_taste_rank['restaurant_name'].apply(lambda name: name.split(" ")[0])
     # 순위 컬럼 추가 (문자열로 변환)
     df_taste_rank['rank'] = (df_taste_rank.index + 1).astype(str)
     # 막대그래프 그리기(순위를 색상 기준으로 설정)
@@ -159,6 +160,7 @@ def plot_cumulative_avg(df, selected_restaurant):
     fig.update_yaxes(range=[0, 5])
     fig.update_layout(title=dict(x=0.5, font=dict(size=18)))
     return fig
+
 # 선택한 가게의 메뉴별 평점 막대 그래프
 def plot_menu_avg(df, selected_restaurant):
     selected_df = df[df['restaurant_name'] == selected_restaurant]
@@ -183,9 +185,8 @@ def plot_track_favorites(df):
             break
         most_visited_restaurants = group.nlargest(5, 'count')
         fig = px.pie(most_visited_restaurants, names='restaurant_name', values='count', hover_data={'count': True}, labels={'restaurant_name': '식당명', 'count': '방문 횟수'}, color_discrete_sequence=px.colors.qualitative.Set3, title=f"{track}반이!<br>좋아하는 식당")
-        fig.update_layout(title_font_size=14, legend_font_size=9)
+        fig.update_layout(title_font_size=20, legend_font_size=15)
         fig.update_traces(marker=dict(line=dict(color='black', width=1)))
-        
         columns[i].plotly_chart(fig, use_container_width=True)
 
 # 메트릭스 표시
@@ -244,14 +245,12 @@ st.write("")
 st.write("")
 st.write("")
 st.write("")
-# 메트릭1: 맛점수
-met1_1, met2_1 = st.columns([1, 1])
-met1_1.metric(label = ':+1::-1: 전체 가게 맛점수 평균', value = f"{df['flavor'].mean():.1f}점")
-met2_1.metric(label = '💸 전체 가게 가격대 평균', value = f"{df['cost'].mean():,.0f}원")
-st.write("")
-st.write("")
-st.write("")
-st.write("")
+
+with st.container(border = True):
+    # 메트릭1: 맛점수
+    met1_1, met2_1 = st.columns([1, 1])
+    met1_1.metric(label = ':+1::-1: 전체 가게 맛점수 평균', value = f"{df['flavor'].mean():.1f}점")
+    met2_1.metric(label = '💸 전체 가게 가격대 평균', value = f"{df['cost'].mean():,.0f}원")
 
 with st.container(border=True):
     # 가게명 선택 및 관련 통계 출력
@@ -259,9 +258,11 @@ with st.container(border=True):
     display_metrics(df, rest)
     st.plotly_chart(plot_cumulative_avg(df, rest), use_container_width=True)
     st.plotly_chart(plot_menu_avg(df, rest), use_container_width=True)
+    
 st.write("")
 st.write("")
 st.write("")
 st.write("")
 # track별 파이 차트 출력
+
 plot_track_favorites(df)

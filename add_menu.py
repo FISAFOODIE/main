@@ -26,7 +26,8 @@ def connect_db():
 
 st.set_page_config( # 항상 제일 먼저
     page_title="FISAFOODIE",
-    page_icon="🍽"
+    page_icon="🍽",
+    layout="wide"
 )
 
 

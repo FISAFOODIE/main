@@ -16,6 +16,7 @@ password = os.getenv('DB_PASSWORD')
 port = int(os.getenv('DB_PORT', 3306))  # 기본 포트는 3306
 database_name = os.getenv('DB_NAME')
 
+
 # MySQL 연결 설정
 def connect_db():
     return pymysql.connect(
@@ -26,11 +27,13 @@ def connect_db():
         database=database_name
     )
 
+
 st.set_page_config(page_title="FISAFOODIE", page_icon=":각얼음:")
 
 # 페이지 제목
 st.title("대시보드")
 st.divider()
+
 
 # MySQL 연결 및 데이터 로드
 def load_data():
@@ -40,7 +43,9 @@ def load_data():
     connection.close()
     return df
 
+
 df = load_data()
+
 
 # 가격대 문자열을 평균값으로 변환하는 함수
 def get_avg_price_from_range(price_range_str):
@@ -53,7 +58,9 @@ def get_avg_price_from_range(price_range_str):
     }
     return price_map.get(price_range_str, None)
 
+
 df['cost'] = df['cost'].apply(get_avg_price_from_range)
+
 
 # 그래프 제목 추가
 def add_title(fig, title):
@@ -66,14 +73,18 @@ def add_title(fig, title):
         )
     )
 
+
 # 가게 Rank 그래프
 def plot_taste_rank(df):
     df_taste_rank = df.groupby('restaurant_name')['flavor'].mean().sort_values(ascending=False).reset_index()[:10]
-    df_taste_rank['restaurant_name_줄바꿈'] = df_taste_rank['restaurant_name'].apply(lambda name: "<br>".join(name.split(" ")))
+    df_taste_rank['restaurant_name_줄바꿈'] = df_taste_rank['restaurant_name'].apply(
+        lambda name: "<br>".join(name.split(" ")))
 
-    fig = px.bar(df_taste_rank, x='restaurant_name_줄바꿈', y='flavor', labels={'restaurant_name_줄바꿈': '가게', 'flavor': '맛점수'})
+    fig = px.bar(df_taste_rank, x='restaurant_name_줄바꿈', y='flavor',
+                 labels={'restaurant_name_줄바꿈': '가게', 'flavor': '맛점수'})
     add_title(fig, "Top 10! 맛있는 집 rank 👑")
     return fig
+
 
 # 금주의 가게 Rank 그래프
 def plot_this_week_rank(df):
@@ -86,15 +97,19 @@ def plot_this_week_rank(df):
 
     df['date'] = pd.to_datetime(df['date'])
     this_week_df = df[(df['date'] >= start_of_week) & (df['date'] <= end_of_week)]
-    this_week_df = this_week_df.groupby('restaurant_name')['flavor'].mean().sort_values(ascending=False).reset_index()[:3]
+    this_week_df = this_week_df.groupby('restaurant_name')['flavor'].mean().sort_values(ascending=False).reset_index()[
+                   :3]
     this_week_df['rank'] = range(1, len(this_week_df) + 1)
-    this_week_df['restaurant_name_줄바꿈'] = this_week_df['restaurant_name'].apply(lambda name: "<br>".join(name.split(" ")))
+    this_week_df['restaurant_name_줄바꿈'] = this_week_df['restaurant_name'].apply(
+        lambda name: "<br>".join(name.split(" ")))
 
-    fig = px.bar(this_week_df, x='restaurant_name_줄바꿈', y='flavor', labels={'restaurant_name_줄바꿈': '가게', 'flavor': '맛점수'})
+    fig = px.bar(this_week_df, x='restaurant_name_줄바꿈', y='flavor',
+                 labels={'restaurant_name_줄바꿈': '가게', 'flavor': '맛점수'})
     fig.update_xaxes(tickangle=0)
     fig.update_yaxes(tickangle=0)
     add_title(fig, f"이번주 rank Top3 👑<br>({start_of_week_str} ~ {end_of_week_str})")
     return fig
+
 
 # 선택한 가게의 누적 평균 맛 점수 선 그래프
 def plot_cumulative_avg(df, selected_restaurant):
@@ -102,20 +117,25 @@ def plot_cumulative_avg(df, selected_restaurant):
     selected_df = selected_df.sort_values('date')
     selected_df['누적평균'] = selected_df['flavor'].expanding().mean()
 
-    fig = px.line(selected_df, x='date', y='누적평균', title=f"{selected_restaurant}의 일자별 맛점수 변화", labels={'date': '날짜', '누적평균': '맛점수'})
+    fig = px.line(selected_df, x='date', y='누적평균', title=f"{selected_restaurant}의 일자별 맛점수 변화",
+                  labels={'date': '날짜', '누적평균': '맛점수'})
     fig.update_xaxes(tickformat='%Y-%m-%d', dtick='D1')
     fig.update_yaxes(range=[0, 5])
     fig.update_layout(title=dict(x=0.5, font=dict(size=18)))
     return fig
+
 
 # 선택한 가게의 메뉴별 평점 막대 그래프
 def plot_menu_avg(df, selected_restaurant):
     selected_df = df[df['restaurant_name'] == selected_restaurant]
     menu_avg = selected_df.groupby(['menu', 'class']).agg({'flavor': 'mean', 'cost': 'first'}).reset_index()
 
-    fig = px.bar(menu_avg, x='menu', y='flavor', hover_data={'class' : False, 'flavor': False, 'cost': True}, labels={'menu': '메뉴명', 'flavor': '맛점수', 'cost': '가격대'}, title=f"{selected_restaurant} 메뉴별 평균 맛점수", color='class', barmode="group")
+    fig = px.bar(menu_avg, x='menu', y='flavor', hover_data={'class': False, 'flavor': False, 'cost': True},
+                 labels={'menu': '메뉴명', 'flavor': '맛점수', 'cost': '가격대'}, title=f"{selected_restaurant} 메뉴별 평균 맛점수",
+                 color='class', barmode="group")
     fig.update_yaxes(range=[0, 5])
     return fig
+
 
 # 상위 3개 식당을 track별로 파이 차트로 그리기
 def plot_track_favorites(df):
@@ -127,10 +147,13 @@ def plot_track_favorites(df):
             break
         most_visited_restaurants = group.nlargest(5, 'count')
 
-        fig = px.pie(most_visited_restaurants, names='restaurant_name', values='count', hover_data={'count': True}, labels={'restaurant_name': '식당명', 'count': '방문 횟수'}, color_discrete_sequence=px.colors.qualitative.Set3, title=f"{track}반이!<br>좋아하는 식당")
+        fig = px.pie(most_visited_restaurants, names='restaurant_name', values='count', hover_data={'count': True},
+                     labels={'restaurant_name': '식당명', 'count': '방문 횟수'},
+                     color_discrete_sequence=px.colors.qualitative.Set3, title=f"{track}반이!<br>좋아하는 식당")
         fig.update_layout(title_font_size=14, legend_font_size=9)
         fig.update_traces(marker=dict(line=dict(color='black', width=1)))
         columns[i].plotly_chart(fig, use_container_width=True)
+
 
 # 메트릭스 표시
 def display_metrics(df, selected_restaurant):
@@ -159,6 +182,7 @@ def display_metrics(df, selected_restaurant):
             most_frequent_class = '클라_서비스'
 
     met3.metric(label="가게 점령반", value=f'{most_frequent_class}')
+
 
 # 그래프 출력
 col1, col2 = st.columns([2, 2])

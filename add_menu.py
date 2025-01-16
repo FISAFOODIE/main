@@ -14,6 +14,7 @@ password = os.getenv('DB_PASSWORD')
 port = int(os.getenv('DB_PORT', 3306))
 database_name = os.getenv('DB_NAME')
 
+
 # MySQL 연결 설정
 def connect_db():
     return pymysql.connect(
@@ -24,14 +25,15 @@ def connect_db():
         database=database_name
     )
 
-st.set_page_config( # 항상 제일 먼저
+
+st.set_page_config(  # 항상 제일 먼저
     page_title="FISAFOODIE",
     page_icon="🍽",
     layout="wide"
 )
 
 
-def set_bg_hack(main_bg): # background
+def set_bg_hack(main_bg):  # background
     # Extract file extension (e.g., png, jpg)
     main_bg_ext = main_bg.split('.')[-1]
 
@@ -69,7 +71,6 @@ st.markdown("<div class='title'>🍴 점메츄 프로젝트 🍴</div>", unsafe_
 st.markdown("<div class='sub-title'>FISA 아카데미 학생들을 위한 맛집 찾기 페이지</div>", unsafe_allow_html=True)
 st.divider()
 
-
 # 데이터베이스 설정
 table_name = "restaurant_reviews"  # 실제 테이블 이름으로 변경
 
@@ -84,7 +85,7 @@ phone_num = st.text_input("")
 st.divider()
 
 st.markdown('<div class="custom-text">👦👩 성별을 선택해주세요! </div>', unsafe_allow_html=True)
-sex_ = st.radio("", ["남", "여"], horizontal = True)
+sex_ = st.radio("", ["남", "여"], horizontal=True)
 st.divider()
 
 st.markdown('<div class="custom-text">🚩 수강 중인 트랙을 선택해주세요! </div>', unsafe_allow_html=True)
@@ -119,7 +120,7 @@ taste_ = st.feedback(key="taste", options="stars")
 
 st.divider()
 st.markdown('<div class="custom-text">🚶 식당 접근성은 어땠나요? (거리, 횡단보도 건넌 횟수, 엘리베이터 여부)</div>', unsafe_allow_html=True)
-accessibility_ = st.feedback(key="accessibility",options="stars")
+accessibility_ = st.feedback(key="accessibility", options="stars")
 
 st.divider()
 

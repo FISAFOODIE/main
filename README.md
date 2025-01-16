@@ -1,20 +1,31 @@
 # 점메츄: 우리만의 메뉴 리뷰 플랫폼
 
 ## ⚒️ Tools
-- **프로그래밍 언어 및 라이브러리:**
-  - Python
-  - Pandas
-  - NumPy
-  - Plotly
-  - Streamlit
+- **프로그래밍 언어 및 라이브러리**
+  
+ ![Python](https://img.shields.io/badge/python-3776AB.svg?&style=for-the-badge&logo=python&logoColor=white)
+ ![Pandas](https://img.shields.io/badge/pandas-150458.svg?&style=for-the-badge&logo=pandas&logoColor=white)
+ ![NumPy](https://img.shields.io/badge/numpy-013243.svg?&style=for-the-badge&logo=numpy&logoColor=white)
+ ![ Plotly](https://img.shields.io/badge/plotly-3F4F75.svg?&style=for-the-badge&logo=plotly&logoColor=white) 
+ ![Streamlit](https://img.shields.io/badge/streamlit-FF4B4B.svg?&style=for-the-badge&logo=streamlit&logoColor=white)
 
-- **데이터베이스 및 서버:**
-  - MySQL
-  - OSM(OpenStreetMap)
+- **데이터베이스 및 서버**
 
-- **버전 관리 및 협업 도구:**
-  - GitHub
-  - Slack
+ ![MySQL](https://img.shields.io/badge/mysql-4479A1.svg?&style=for-the-badge&logo=mysql&logoColor=white)
+
+- **지도 및 위치 기반 서비스:**
+
+ ![OpenStreetMap](https://img.shields.io/badge/openstreetmap-7EBC6F.svg?&style=for-the-badge&logo=openstreetmap&logoColor=white)
+  
+- **버전 관리 및 협업 도구**
+  
+ ![GitHub](https://img.shields.io/badge/github-181717.svg?&style=for-the-badge&logo=github&logoColor=white) 
+ ![Slack](https://img.shields.io/badge/slack-4A154B.svg?&style=for-the-badge&logo=slack&logoColor=white)
+
+
+ 
+
+
 
 
 ## 📌 주제 선정 이유

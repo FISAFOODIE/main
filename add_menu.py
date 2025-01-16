@@ -34,11 +34,11 @@ st.set_page_config( # 항상 제일 먼저
 def set_bg_hack(main_bg): # background
     # Extract file extension (e.g., png, jpg)
     main_bg_ext = main_bg.split('.')[-1]
-    
+
     # Read and encode the image
     with open(main_bg, "rb") as image_file:
         encoded_string = base64.b64encode(image_file.read()).decode()
-        
+
     # Apply background via custom CSS
     st.markdown(
         f"""
@@ -61,8 +61,8 @@ with open("./default.css") as f:
 
 # CSS 적용 코드
 st.markdown(f'<style> {css} </style>',
-    unsafe_allow_html=True,
-)
+            unsafe_allow_html=True,
+            )
 
 # 제목
 st.markdown("<div class='title'>🍴 점메츄 프로젝트 🍴</div>", unsafe_allow_html=True)

@@ -135,13 +135,13 @@ def plot_track_favorites(df):
 # 메트릭스 표시
 def display_metrics(df, selected_restaurant):
     selected_df = df[df['restaurant_name'] == selected_restaurant]
-    
+
     # 메트릭1: 맛점수
     met1, met2, met3 = st.columns([1, 1, 2])
     met1.metric(label="맛점수",
                 value=f"{selected_df['flavor'].mean():.1f}",
                 delta=f"{selected_df['flavor'].mean() - df['flavor'].mean():.1f}"
-                )   
+                )
 
     # 메트릭2: 평균 가격대
     met2.metric(label="평균가격대",

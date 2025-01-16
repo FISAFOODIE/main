@@ -54,7 +54,22 @@ def set_bg_hack(main_bg): # background
 set_bg_hack(r"bg1.png")
 
 # 페이지 제목
-st.title("_:blue[우리]_ 만의 정보 🍽")
+st.markdown(
+    """
+    <style>
+        .title {
+            text-align: center;
+            font-size: 50px;
+        }
+        .blue {
+            color: blue;
+        }
+    </style>
+    <div class='title'>🍚 <span class='blue'>우리</span>만의 정보 🍚</div>
+    """, 
+    unsafe_allow_html=True
+)
+
 st.divider()
 # MySQL 연결 및 데이터 로드
 def load_data():
@@ -63,6 +78,7 @@ def load_data():
     df = pd.read_sql(query, connection)
     connection.close()
     return df
+
 # SQL 테이블을 데이터프레임으로 담기
 df = load_data()
 # 가격대 문자열을 해당 구간의 최고값으로 변환하는 함수
@@ -75,8 +91,10 @@ def get_avg_price_from_range(price_range_str):
         '14000원 이상': 17000
     }
     return price_map.get(price_range_str, None)
+
 # 'cost'열에 적용해서 자료형 변환'문자열' -> '숫자형'
 df['cost'] = df['cost'].apply(get_avg_price_from_range)
+
 # 그래프 제목 추가 함수
 def add_title(fig, title):
     fig.update_layout(
@@ -130,6 +148,7 @@ def plot_this_week_rank(df, start_of_week, end_of_week):
     fig.update_yaxes(tickangle=0, range=[0, 5])
     add_title(fig, f"해당 주차 Rank Top3 👑")
     return fig
+
 # 선택한 가게의 누적 평균 맛 점수 선 그래프
 def plot_cumulative_avg(df, selected_restaurant):
     selected_df = df[df['restaurant_name'] == selected_restaurant]
@@ -154,6 +173,7 @@ def plot_menu_avg(df, selected_restaurant):
                 barmode="group")
     fig.update_yaxes(range=[0, 5])
     return fig
+
 # 상위 3개 식당을 track별로 파이 차트로 그리기
 def plot_track_favorites(df):
     track_restaurant_counts = df.groupby(['class', 'restaurant_name']).size().reset_index(name='count')
@@ -165,7 +185,9 @@ def plot_track_favorites(df):
         fig = px.pie(most_visited_restaurants, names='restaurant_name', values='count', hover_data={'count': True}, labels={'restaurant_name': '식당명', 'count': '방문 횟수'}, color_discrete_sequence=px.colors.qualitative.Set3, title=f"{track}반이!<br>좋아하는 식당")
         fig.update_layout(title_font_size=14, legend_font_size=9)
         fig.update_traces(marker=dict(line=dict(color='black', width=1)))
+        
         columns[i].plotly_chart(fig, use_container_width=True)
+
 # 메트릭스 표시
 def display_metrics(df, selected_restaurant):
     selected_df = df[df['restaurant_name'] == selected_restaurant]
@@ -189,6 +211,7 @@ def display_metrics(df, selected_restaurant):
         case '클라우드 서비스':
             most_frequent_class = '클라_서비스'
     met3.metric(label="가게 점령반", value=f'{most_frequent_class}')
+
 # 그래프 출력
 col1, col2 = st.columns([2, 2], vertical_alignment="bottom")
 with col1:
@@ -199,10 +222,11 @@ with col1:
     # 새로운 데이터프레임 생성
     overview_df = pd.DataFrame(
         {
-            "전체 리뷰 수": [total_reviews],
-            "리뷰한 가게 수": [unique_restaurants],
+            "리뷰 수": [total_reviews],
+            "가게 수": [unique_restaurants],
         }
     )
+
     st.markdown(overview_df.to_html(index=False, escape=False), unsafe_allow_html=True)
     st.plotly_chart(plot_taste_rank(df), use_container_width=True)
     

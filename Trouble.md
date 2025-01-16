@@ -3,8 +3,13 @@
    
 ![image](https://github.com/user-attachments/assets/45d99f78-4726-4ef2-8a7a-3f2d7a6ca998)
 
-3. 1시간 가량 구글링을 하다가 테이블 재생성 직전에 테이블 구조 확인하였음..
+2. 1시간 가량 구글링을 하다가 테이블 재생성 직전에 테이블 구조 확인하였음..
 
 ![image](https://github.com/user-attachments/assets/a93eba97-f6e0-4f86-a259-4640fb32ad3b)
 
-5. "track"에서 앞자리에 공백이 추가된 " track"으로 확인..
+3. "track"에서 앞자리에 공백이 추가된 " track"으로 확인..
+
+
+- Streamlit에서 별점 선택시 인덱스 처리 -> 별점 5개 선택시 4 입력, 별점 1개 선택시 0 입력
+
+![image](https://github.com/user-attachments/assets/93eb3c86-098b-4c13-9721-e0cbae53adb7)

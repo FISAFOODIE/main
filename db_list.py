@@ -13,7 +13,6 @@ password = os.getenv('DB_PASSWORD')
 port = int(os.getenv('DB_PORT', 3306))  # 기본 포트는 3306
 database_name = os.getenv('DB_NAME')
 
-
 # MySQL 연결 설정
 def connect_db():
     return pymysql.connect(
@@ -24,7 +23,6 @@ def connect_db():
         database=database_name
     )
 
-
 # 한 페이지당 출력할 데이터 수
 PAGE_SIZE = 10
 
@@ -34,12 +32,11 @@ st.set_page_config(
 )
 
 # 제목
-st.title(":knife_fork_plate: :rainbow[점메츄] - 메뉴 관리:knife_fork_plate:")
+st.title(":knife_fork_plate: :rainbow[우리 갤러리]:knife_fork_plate:")
 st.divider()
 
 # 데이터베이스 설정
 table_name = "restaurant_reviews"  # 실제 테이블 이름으로 변경
-
 
 # 데이터베이스에서 정보 조회 (LIMIT 및 OFFSET을 이용하여 페이지마다 다른 데이터 로드)
 def fetch_db_data(offset=0, limit=PAGE_SIZE):
@@ -47,8 +44,8 @@ def fetch_db_data(offset=0, limit=PAGE_SIZE):
         connection = connect_db()
         cursor = connection.cursor()
 
-        # 쿼리 작성 (LIMIT과 OFFSET을 사용하여 페이지네이션 처리)
-        select_query = f"SELECT * FROM {table_name} LIMIT %s OFFSET %s"
+        # 쿼리 작성 (날짜 기준으로 오름차순 정렬)
+        select_query = f"SELECT * FROM {table_name} ORDER BY date DESC LIMIT %s OFFSET %s"
         cursor.execute(select_query, (limit, offset))
         rows = cursor.fetchall()
 
@@ -58,7 +55,6 @@ def fetch_db_data(offset=0, limit=PAGE_SIZE):
         return []
     finally:
         connection.close()
-
 
 # 데이터베이스에서 총 데이터 개수 조회 (전체 페이지 수 계산을 위한 용도)
 def fetch_total_data_count():
@@ -77,7 +73,6 @@ def fetch_total_data_count():
         return 0
     finally:
         connection.close()
-
 
 # 총 데이터 개수
 total_count = fetch_total_data_count()

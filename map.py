@@ -39,7 +39,8 @@ def get_mysql_connection():
     except pymysql.MySQLError as e:
         print(f"데이터베이스 연결 실패: {e}")
         return None
-st.title(":knife_fork_plate: :rainbow[가게 위치 매핑] - 지도 표시 :knife_fork_plate:")
+st.title(":knife_fork_plate: :rainbow[방문 식당 위치 보기] :knife_fork_plate:")
+
 st.write("수강생들이 많이 먹은 가게 위치를 찾아보아요!")
 st.divider()
 

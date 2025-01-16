@@ -16,7 +16,7 @@
 - **지도 및 위치 기반 서비스:**
 
  ![OpenStreetMap](https://img.shields.io/badge/openstreetmap-7EBC6F.svg?&style=for-the-badge&logo=openstreetmap&logoColor=white)
-  
+ ![Folium](https://img.shields.io/badge/folium-77B829.svg?&style=for-the-badge&logo=folium&logoColor=white) 
 - **버전 관리 및 협업 도구**
   
  ![GitHub](https://img.shields.io/badge/github-181717.svg?&style=for-the-badge&logo=github&logoColor=white) 
@@ -79,13 +79,37 @@
 
 ---
 
-### 3. **방문 식당 위치 보기**
-- 사용자가 방문한 **전체 식당의 위치를 지도에 표시.**
+### 3. 방문 식당 위치 보기
+
+**기능 개요**  
+- OpenStreetMap의 Nominatim API를 활용하여 식당들의 위도와 경도를 조회하고, Folium을 사용해 지도를 생성하여 시각적으로 표시
+
+**구체적인 흐름**
+
+1. **DB에서 식당 이름 가져오기**  
+
+2. **OpenStreetMap의 Nominatim API를 사용하여 위치 정보 조회**  
+
+3. **위치 정보 저장 통한 반복적인 API 요청 줄이기**  
+
+4. **Folium사용하여 지도로 표시**  
+
 
 ---
 
-### 4. **우리 갤러리**
-- 데이터베이스의 각 리뷰(행) 정보와 함께 업로드된 음식 사진을 표시.
-- 텍스트와 이미지를 나란히 배치하여 시각적으로 정보를 제공.
+### 4. 우리 갤러리
+
+**기능 개요**  
+데이터베이스의 각 리뷰(행) 정보와 함께 업로드된 음식 사진을 표시
+
+**구체적인 흐름**
+
+1. **리뷰 정보 조회**
+
+2. **페이지네이션 처리**
+
+3. **텍스트와 이미지 배치**
+
+4.  **오류 처리**  
 
 ---

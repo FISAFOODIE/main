@@ -10,6 +10,9 @@
 3. "track"에서 앞자리에 공백이 추가된 " track"으로 확인..
 
 
+---
+
+
 - Streamlit에서 별점 선택시 인덱스 처리 -> 별점 5개 선택시 4 입력, 별점 1개 선택시 0 입력
 
 ![image](https://github.com/user-attachments/assets/93eb3c86-098b-4c13-9721-e0cbae53adb7)

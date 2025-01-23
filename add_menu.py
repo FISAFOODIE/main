@@ -210,6 +210,9 @@ if st.button("등록"):
         # 여기서 restaurant_name_가 올바르게 업데이트 되었는지 확인
         st.write(f"DB에 저장될 식당 이름: {restaurant_name_}")
 
+        # 쉼표를 제거한 restaurant_mapping_name 생성
+        restaurant_mapping_name = restaurant_name_.split(",")[0]
+
         # 입력 데이터 준비
         sex_item = sex_
         class_item = class_
@@ -222,15 +225,15 @@ if st.button("등록"):
         date_item = date_  # 선택한 날짜
         phone_item = phone_num  # 전화번호
 
-        # 쿼리 작성
+        # 쿼리 작성 (restaurant_mapping_name 추가)
         insert_query = f"""
-        INSERT INTO {table_name} (sex, class, restaurant_name, menu, cost, flavor, picture, accessibility, date, phone_num)
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        INSERT INTO {table_name} (sex, class, restaurant_name, restaurant_mapping_name, menu, cost, flavor, picture, accessibility, date, phone_num)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         """
 
         # 데이터 삽입
         cursor.execute(insert_query, (
-            sex_item, class_item, restaurant_name, menu_item, price_item,
+            sex_item, class_item, restaurant_name, restaurant_mapping_name, menu_item, price_item,
             flavor_item, picture_item, accessibility_item, date_item, phone_item
         ))
 

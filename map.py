@@ -158,9 +158,14 @@ else:
         for store_name, location in mapped_restaurants.items():
             # 가게 이름에서 첫 번째 쉼표 전까지 추출
             display_name = store_name.split(',')[0]  # 쉼표 앞부분만 사용
+            popup_html = f"""
+                <div style="width: 150px; height: 40px; display: flex; justify-content: center; align-items: center;">
+                    <span style="font-size: 14px; font-weight: bold;">{display_name}</span>
+                </div>
+            """
             folium.Marker(
                 location=[location['latitude'], location['longitude']],
-                popup=display_name,  # 마커 클릭 시 가게 이름만 표시
+                popup=folium.Popup(popup_html, max_width=200),
                 icon=folium.Icon(icon="cloud")
             ).add_to(marker_cluster)
 
@@ -169,9 +174,14 @@ else:
             print("새로 찾은 가게들 지도에 표시 중...")
             for restaurant in new_restaurant_data:
                 display_name = restaurant['name'].split(',')[0]  # 쉼표 앞부분만 사용
+                popup_html = f"""
+                    <div style="width: 200px; height: 50px; display: flex; justify-content: center; align-items: center;">
+                        <span style="font-size: 14px; font-weight: bold;">{display_name}</span>
+                    </div>
+                """
                 folium.Marker(
                     location=[restaurant['latitude'], restaurant['longitude']],
-                    popup=display_name,  # 마커 클릭 시 가게 이름만 표시
+                    popup=folium.Popup(popup_html, max_width=200),
                     icon=folium.Icon(icon="cloud", color="green")
                 ).add_to(marker_cluster)
 

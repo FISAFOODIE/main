@@ -4,9 +4,14 @@ from dotenv import load_dotenv
 import os
 import time
 import base64
+from geopy.distance import geodesic
+from geopy.geocoders import Nominatim
 
 # .env 파일 로드
 load_dotenv()
+
+# 기준 좌표 (위도, 경도)
+CURRENT_LOCATION = (37.5707485, 126.8798744)
 
 # .env 파일에서 MySQL 연결 정보 가져오기
 host = os.getenv('DB_HOST')
@@ -86,7 +91,8 @@ phone_num = st.text_input("")
 st.divider()
 
 st.markdown('<div class="custom-text">👦👩 성별을 선택해주세요! </div>', unsafe_allow_html=True)
-sex_ = st.radio("", ["남", "여"], horizontal=True)
+sex_ = st.radio("", ["남", "여"], label_visibility="hidden", horizontal=True)
+
 st.divider()
 
 st.markdown('<div class="custom-text">🚩 수강 중인 트랙을 선택해주세요! </div>', unsafe_allow_html=True)
@@ -136,6 +142,34 @@ else:
 taste_item = taste_ if taste_ else 1  # 기본값을 1로 설정 (원하는 값으로 변경 가능)
 
 st.divider()
+# 근처 식당을 찾는 함수
+# OSM(OpenStreetMap) 기반 식당 검색 (디버깅 포함)
+def find_nearest_restaurant(query):
+    geolocator = Nominatim(user_agent="streamlit-app")
+    location_results = geolocator.geocode(query, exactly_one=False, addressdetails=True)
+
+    if not location_results:
+        return None, "No results found"
+
+    # 결과와 거리 계산
+    filtered_results = []
+    for location in location_results:
+        coords = (location.latitude, location.longitude)
+        distance = geodesic(CURRENT_LOCATION, coords).km
+        # st.write(f"DEBUG: 검색된 결과: {location.address}, 거리: {distance:.2f}km")
+        if distance <= 3:  # 3km 이내
+            filtered_results.append((location, distance))
+
+    # 거리순 정렬
+    filtered_results.sort(key=lambda x: x[1])
+
+    if len(filtered_results) == 0:
+        return None, "No results within 3km"
+    elif len(filtered_results) == 1:
+        return filtered_results[0][0].address, "Single result found"
+    else:
+        return filtered_results[0][0].address, "Multiple results, closest selected"
+
 
 if st.button("등록"):
     try:
@@ -143,10 +177,45 @@ if st.button("등록"):
         connection = connect_db()
         cursor = connection.cursor()
 
+        if restaurant_name_:
+            # 1. 초기 검색
+            address, status = find_nearest_restaurant(restaurant_name_)
+            # st.write(f"DEBUG: 초기 검색 결과 - Address: {address}, Status: {status}")
+
+            # 2. 초기 검색 결과 처리
+            if status == "No results found" or status == "No results within 3km":
+                st.warning("검색 결과가 없습니다. '상암'을 추가하여 다시 검색합니다.")
+
+                # "상암" 추가 후 재검색
+                updated_search_query = f"{restaurant_name_} 상암"
+                address, status = find_nearest_restaurant(updated_search_query)
+                # st.write(f"DEBUG: '상암' 추가 후 검색 결과 - Address: {address}, Status: {status}")
+
+                # 재검색 결과 처리
+                if status == "No results found":
+                    st.error("'상암'을 추가했음에도 검색 결과가 없습니다. 다른 키워드로 다시 시도하세요.")
+                elif status == "No results within 3km":
+                    st.error("3km 내에 식당이 없습니다. 지역 정보를 더 구체적으로 입력해 보세요.")
+                else:
+                    # 최종 검색된 주소를 restaurant_name_에 반영
+                    restaurant_name_ = address
+            else:
+                # 검색된 결과가 있을 경우, 그대로 restaurant_name_에 반영
+                restaurant_name_ = address
+                st.success(f"검색 성공! 선택된 식당: {address}")
+        else:
+            st.warning("식당 이름을 입력해주세요.")
+
+        # 여기서 restaurant_name_가 올바르게 업데이트 되었는지 확인
+        # st.write(f"DB에 저장될 식당 이름: {restaurant_name_}")
+
+        # 쉼표를 제거한 restaurant_mapping_name 생성
+        restaurant_mapping_name = restaurant_name_.split(",")[0]
+
         # 입력 데이터 준비
         sex_item = sex_
         class_item = class_
-        restaurant_name_item = restaurant_name_
+        restaurant_name = restaurant_name_  # 최종적으로 업데이트된 식당 이름 사용
         menu_item = menu_
         price_item = price_  # 가격대 선택값
         picture_item = image_data  # 이미지 바이너리 데이터 (이미지가 없으면 None)
@@ -155,15 +224,15 @@ if st.button("등록"):
         date_item = date_  # 선택한 날짜
         phone_item = phone_num  # 전화번호
 
-        # 쿼리 작성
+        # 쿼리 작성 (restaurant_mapping_name 추가)
         insert_query = f"""
-        INSERT INTO {table_name} (sex, class, restaurant_name, menu, cost, flavor, picture, accessibility, date, phone_num)
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        INSERT INTO {table_name} (sex, class, restaurant_name, restaurant_mapping_name, menu, cost, flavor, picture, accessibility, date, phone_num)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         """
 
         # 데이터 삽입
         cursor.execute(insert_query, (
-            sex_item, class_item, restaurant_name_item, menu_item, price_item,
+            sex_item, class_item, restaurant_name, restaurant_mapping_name, menu_item, price_item,
             flavor_item, picture_item, accessibility_item, date_item, phone_item
         ))
 

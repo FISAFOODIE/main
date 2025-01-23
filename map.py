@@ -39,6 +39,7 @@ def get_mysql_connection():
     except pymysql.MySQLError as e:
         print(f"데이터베이스 연결 실패: {e}")
         return None
+
 st.title(":knife_fork_plate: :rainbow[방문 식당 위치 보기] :knife_fork_plate:")
 
 st.write("수강생들이 많이 먹은 가게 위치를 찾아보아요!")
@@ -56,16 +57,21 @@ def get_restaurant_names():
         cursor.execute("SELECT restaurant_name FROM restaurant_reviews")
         restaurants = cursor.fetchall()
         print(f"가게 이름 가져오기 완료: {len(restaurants)}개")
+        result = []
+        for restaurant in restaurants:
+            print(f"원본 가게 이름: '{restaurant[0]}'")  # 원본 가게 이름 출력
+            result.append(restaurant[0])  # 원본 이름 그대로 사용
+
         conn.close()
-        return restaurants
+        return result
     except pymysql.MySQLError as e:
         print(f"SQL 실행 오류: {e}")
         conn.close()
         return []
 
-def get_location_from_name(restaurant_name):
-    print(f"'{restaurant_name}' 위치 찾는 중...")
-    url = f"https://nominatim.openstreetmap.org/search?q={restaurant_name}&format=json&addressdetails=1&limit=1"
+def get_location_from_name(name):
+    print(f"'{name}' 위치 찾는 중...")
+    url = f"https://nominatim.openstreetmap.org/search?q={name}&format=json&addressdetails=1&limit=1"
 
     try:
         response = requests.get(url, headers=headers)
@@ -75,7 +81,7 @@ def get_location_from_name(restaurant_name):
             if data:
                 latitude = float(data[0]['lat'])
                 longitude = float(data[0]['lon'])
-                print(f"'{restaurant_name}' 위치 찾기 완료!")
+                print(f"'{name}' 위치 찾기 완료!")
                 return latitude, longitude
             else:
                 return None, None
@@ -97,7 +103,6 @@ def save_mapped_restaurants(mapped_restaurants):
     with open("mapping_data.json", "w") as f:
         json.dump(mapped_restaurants, f)
 
-
 restaurant_data = []
 mapped_restaurants = load_mapped_restaurants()
 
@@ -111,9 +116,7 @@ else:
     # 위치를 새로 찾은 가게 데이터
     new_restaurant_data = []
 
-    for restaurant in restaurants:
-        store_name = restaurant[0]
-
+    for store_name in restaurants:
         # 이미 처리된 가게라면 건너뛰기
         if store_name in mapped_restaurants:
             print(f"가게 '{store_name}'은 이미 매핑되었습니다.")
@@ -142,8 +145,10 @@ else:
     save_mapped_restaurants(mapped_restaurants)
 
     # Folium 지도를 생성
+    # Folium 지도를 생성 (처음 한 번만)
     if mapped_restaurants:  # 기본 매핑된 가게들
         print("기존 매핑된 가게들 지도에 표시 중...")
+
         # 지도 중심을 첫 번째 가게의 위치로 설정 (기존 데이터로 설정)
         first_location = list(mapped_restaurants.values())[0]  # 첫 번째 가게
         folium_map = folium.Map(location=[first_location['latitude'], first_location['longitude']], zoom_start=12)
@@ -153,9 +158,16 @@ else:
 
         # 기본 매핑된 가게 마커 추가
         for store_name, location in mapped_restaurants.items():
+            # 가게 이름에서 첫 번째 쉼표 전까지 추출
+            display_name = store_name.split(',')[0]  # 쉼표 앞부분만 사용
+            popup_html = f"""
+                <div style="width: 150px; height: 40px; display: flex; justify-content: center; align-items: center;">
+                    <span style="font-size: 14px; font-weight: bold;">{display_name}</span>
+                </div>
+            """
             folium.Marker(
                 location=[location['latitude'], location['longitude']],
-                popup=store_name,  # 마커 클릭 시 가게 이름 표시
+                popup=folium.Popup(popup_html, max_width=200),
                 icon=folium.Icon(icon="cloud")
             ).add_to(marker_cluster)
 
@@ -163,15 +175,22 @@ else:
         if new_restaurant_data:
             print("새로 찾은 가게들 지도에 표시 중...")
             for restaurant in new_restaurant_data:
+                display_name = restaurant['name'].split(',')[0]  # 쉼표 앞부분만 사용
+                popup_html = f"""
+                    <div style="width: 200px; height: 50px; display: flex; justify-content: center; align-items: center;">
+                        <span style="font-size: 14px; font-weight: bold;">{display_name}</span>
+                    </div>
+                """
                 folium.Marker(
                     location=[restaurant['latitude'], restaurant['longitude']],
-                    popup=restaurant['name'],  # 마커 클릭 시 가게 이름 표시
+                    popup=folium.Popup(popup_html, max_width=200),
                     icon=folium.Icon(icon="cloud", color="green")
                 ).add_to(marker_cluster)
 
         # folium 지도 HTML로 변환 후 Streamlit에 표시
-        folium_map_html = folium_map._repr_html_()
-        html(folium_map_html, height=600)
+        st.components.v1.html(folium_map._repr_html_(), height=600)
+
+
     else:
         print("위치 정보를 찾지 못한 가게들은 지도에 표시되지 않습니다.")
         st.write("위치 정보를 찾지 못한 가게들은 지도에 표시되지 않습니다.")

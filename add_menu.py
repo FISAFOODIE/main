@@ -156,7 +156,7 @@ def find_nearest_restaurant(query):
     for location in location_results:
         coords = (location.latitude, location.longitude)
         distance = geodesic(CURRENT_LOCATION, coords).km
-        st.write(f"DEBUG: 검색된 결과: {location.address}, 거리: {distance:.2f}km")
+        # st.write(f"DEBUG: 검색된 결과: {location.address}, 거리: {distance:.2f}km")
         if distance <= 3:  # 3km 이내
             filtered_results.append((location, distance))
 
@@ -180,7 +180,7 @@ if st.button("등록"):
         if restaurant_name_:
             # 1. 초기 검색
             address, status = find_nearest_restaurant(restaurant_name_)
-            st.write(f"DEBUG: 초기 검색 결과 - Address: {address}, Status: {status}")
+            # st.write(f"DEBUG: 초기 검색 결과 - Address: {address}, Status: {status}")
 
             # 2. 초기 검색 결과 처리
             if status == "No results found" or status == "No results within 3km":
@@ -189,7 +189,7 @@ if st.button("등록"):
                 # "상암" 추가 후 재검색
                 updated_search_query = f"{restaurant_name_} 상암"
                 address, status = find_nearest_restaurant(updated_search_query)
-                st.write(f"DEBUG: '상암' 추가 후 검색 결과 - Address: {address}, Status: {status}")
+                # st.write(f"DEBUG: '상암' 추가 후 검색 결과 - Address: {address}, Status: {status}")
 
                 # 재검색 결과 처리
                 if status == "No results found":
@@ -199,7 +199,6 @@ if st.button("등록"):
                 else:
                     # 최종 검색된 주소를 restaurant_name_에 반영
                     restaurant_name_ = address
-                    st.success(f"검색 성공! 선택된 식당: {address}")
             else:
                 # 검색된 결과가 있을 경우, 그대로 restaurant_name_에 반영
                 restaurant_name_ = address
@@ -208,7 +207,7 @@ if st.button("등록"):
             st.warning("식당 이름을 입력해주세요.")
 
         # 여기서 restaurant_name_가 올바르게 업데이트 되었는지 확인
-        st.write(f"DB에 저장될 식당 이름: {restaurant_name_}")
+        # st.write(f"DB에 저장될 식당 이름: {restaurant_name_}")
 
         # 쉼표를 제거한 restaurant_mapping_name 생성
         restaurant_mapping_name = restaurant_name_.split(",")[0]

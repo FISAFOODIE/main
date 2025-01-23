@@ -145,8 +145,10 @@ else:
     save_mapped_restaurants(mapped_restaurants)
 
     # Folium 지도를 생성
+    # Folium 지도를 생성 (처음 한 번만)
     if mapped_restaurants:  # 기본 매핑된 가게들
         print("기존 매핑된 가게들 지도에 표시 중...")
+
         # 지도 중심을 첫 번째 가게의 위치로 설정 (기존 데이터로 설정)
         first_location = list(mapped_restaurants.values())[0]  # 첫 번째 가게
         folium_map = folium.Map(location=[first_location['latitude'], first_location['longitude']], zoom_start=12)
@@ -186,8 +188,9 @@ else:
                 ).add_to(marker_cluster)
 
         # folium 지도 HTML로 변환 후 Streamlit에 표시
-        folium_map_html = folium_map._repr_html_()
-        html(folium_map_html, height=600)
+        st.components.v1.html(folium_map._repr_html_(), height=600)
+
+
     else:
         print("위치 정보를 찾지 못한 가게들은 지도에 표시되지 않습니다.")
         st.write("위치 정보를 찾지 못한 가게들은 지도에 표시되지 않습니다.")

@@ -109,19 +109,19 @@ def add_title(fig, title):
 
 # 가게 맛 Rank 그래프
 def plot_taste_rank(df):
-    # 'restaurant_name'으로 그룹화 -> 'flavor'의 평균 계산 -> 내림차순 정렬 -> 10개만 슬라이싱
-    df_taste_rank = df.groupby('restaurant_name')['flavor'].mean().sort_values(ascending=False).reset_index()[:10]
-    # 'restaurant_name'에서 공백 기준으로 줄바꿈 -> '상호명 줄바꾸기'
-    df_taste_rank['restaurant_name_줄바꿈'] = df_taste_rank['restaurant_name'].apply(lambda name: name.split(" ")[0])
+    # 'restaurant_mapping_name'으로 그룹화 -> 'flavor'의 평균 계산 -> 내림차순 정렬 -> 10개만 슬라이싱
+    df_taste_rank = df.groupby('restaurant_mapping_name')['flavor'].mean().sort_values(ascending=False).reset_index()[:10]
+    # 'restaurant_mapping_name'에서 공백 기준으로 줄바꿈 -> '상호명 줄바꾸기'
+    df_taste_rank['restaurant_mapping_name_줄바꿈'] = df_taste_rank['restaurant_mapping_name'].apply(lambda name: name.split(" ")[0])
     # 순위 컬럼 추가 (문자열로 변환)
     df_taste_rank['rank'] = (df_taste_rank.index + 1).astype(str)
     # 막대그래프 그리기(순위를 색상 기준으로 설정)
     fig = px.bar(df_taste_rank,
-                x='restaurant_name_줄바꿈',
+                x='restaurant_mapping_name_줄바꿈',
                 y='flavor',
                 color='rank',  # 순위를 기준으로 색상 설정
                 color_discrete_sequence=px.colors.qualitative.Set3,
-                labels={'restaurant_name_줄바꿈': '가게', 'flavor': '맛점수'})
+                labels={'restaurant_mapping_name_줄바꿈': '가게', 'flavor': '맛점수'})
     # 범례 숨기기
     fig.update_layout(showlegend=False)
     fig.update_yaxes(tickangle=0, range=[0, 5])
@@ -133,16 +133,16 @@ def plot_this_week_rank(df, start_of_week, end_of_week):
     # 'datetime' 자료형으로 변환
     df['date'] = pd.to_datetime(df['date'])
     this_week_df = df[(df['date'] >= start_of_week) & (df['date'] <= end_of_week)]
-    this_week_df = this_week_df.groupby('restaurant_name')['flavor'].mean().sort_values(ascending=False).reset_index()[:3]
+    this_week_df = this_week_df.groupby('restaurant_mapping_name')['flavor'].mean().sort_values(ascending=False).reset_index()[:3]
     this_week_df['rank'] = range(1, len(this_week_df) + 1)
     this_week_df['rank'] = this_week_df['rank'].astype(str)
-    this_week_df['restaurant_name_줄바꿈'] = this_week_df['restaurant_name'].apply(lambda name: "<br>".join(name.split(" ")))
+    this_week_df['restaurant_mapping_name_줄바꿈'] = this_week_df['restaurant_mapping_name'].apply(lambda name: "<br>".join(name.split(" ")))
     fig = px.bar(this_week_df,
-                x='restaurant_name_줄바꿈',
+                x='restaurant_mapping_name_줄바꿈',
                 y='flavor',
                 color='rank',  # 순위를 기준으로 색상 설정
                 color_discrete_sequence=px.colors.qualitative.Set3,
-                labels={'restaurant_name_줄바꿈': '가게', 'flavor': '맛점수'})
+                labels={'restaurant_mapping_name_줄바꿈': '가게', 'flavor': '맛점수'})
     # 범례 숨기기
     fig.update_layout(showlegend=False)
     fig.update_xaxes(tickangle=0)
@@ -152,7 +152,7 @@ def plot_this_week_rank(df, start_of_week, end_of_week):
 
 # 선택한 가게의 누적 평균 맛 점수 선 그래프
 def plot_cumulative_avg(df, selected_restaurant):
-    selected_df = df[df['restaurant_name'] == selected_restaurant]
+    selected_df = df[df['restaurant_mapping_name'] == selected_restaurant]
     selected_df = selected_df.sort_values('date')
     selected_df['누적평균'] = selected_df['flavor'].expanding().mean()
     fig = px.line(selected_df, x='date', y='누적평균', title=f"{selected_restaurant}의 일자별 맛점수 변화", labels={'date': '날짜', '누적평균': '맛점수'})
@@ -163,7 +163,7 @@ def plot_cumulative_avg(df, selected_restaurant):
 
 # 선택한 가게의 메뉴별 평점 막대 그래프
 def plot_menu_avg(df, selected_restaurant):
-    selected_df = df[df['restaurant_name'] == selected_restaurant]
+    selected_df = df[df['restaurant_mapping_name'] == selected_restaurant]
     menu_avg = selected_df.groupby(['menu', 'class']).agg({'flavor': 'mean', 'cost': 'first'}).reset_index()
     fig = px.bar(menu_avg,
                 x='menu',
@@ -178,20 +178,20 @@ def plot_menu_avg(df, selected_restaurant):
 
 # 상위 3개 식당을 track별로 파이 차트로 그리기
 def plot_track_favorites(df):
-    track_restaurant_counts = df.groupby(['class', 'restaurant_name']).size().reset_index(name='count')
+    track_restaurant_counts = df.groupby(['class', 'restaurant_mapping_name']).size().reset_index(name='count')
     columns = st.columns(3)
     for i, (track, group) in enumerate(track_restaurant_counts.groupby('class')):
         if i >= 3:
             break
         most_visited_restaurants = group.nlargest(5, 'count')
-        fig = px.pie(most_visited_restaurants, names='restaurant_name', values='count', hover_data={'count': True}, labels={'restaurant_name': '식당명', 'count': '방문 횟수'}, color_discrete_sequence=px.colors.qualitative.Set3, title=f"{track}반이!<br>좋아하는 식당")
+        fig = px.pie(most_visited_restaurants, names='restaurant_mapping_name', values='count', hover_data={'count': True}, labels={'restaurant_mapping_name': '식당명', 'count': '방문 횟수'}, color_discrete_sequence=px.colors.qualitative.Set3, title=f"{track}반이!<br>좋아하는 식당")
         fig.update_layout(title_font_size=20, legend_font_size=15)
         fig.update_traces(marker=dict(line=dict(color='black', width=1)))
         columns[i].plotly_chart(fig, use_container_width=True)
 
 # 메트릭스 표시
 def display_metrics(df, selected_restaurant):
-    selected_df = df[df['restaurant_name'] == selected_restaurant]
+    selected_df = df[df['restaurant_mapping_name'] == selected_restaurant]
     # 메트릭1: 맛점수
     met1, met2, met3 = st.columns([1, 1, 2])
     met1.metric(label="맛점수",
@@ -218,7 +218,7 @@ col1, col2 = st.columns([2, 2], vertical_alignment="bottom")
 with col1:
     # 전체 리뷰 수와 리뷰된 가게 수 계산
     total_reviews = len(df)
-    unique_restaurants = df["restaurant_name"].nunique()
+    unique_restaurants = df["restaurant_mapping_name"].nunique()
     st.header("요약📋")
     # 새로운 데이터프레임 생성
     overview_df = pd.DataFrame(
@@ -254,7 +254,7 @@ with st.container(border = True):
 
 with st.container(border=True):
     # 가게명 선택 및 관련 통계 출력
-    rest = st.selectbox('보고싶은 가게명을 선택하세요', df['restaurant_name'].unique())
+    rest = st.selectbox('보고싶은 가게명을 선택하세요', df['restaurant_mapping_name'].unique())
     display_metrics(df, rest)
     st.plotly_chart(plot_cumulative_avg(df, rest), use_container_width=True)
     st.plotly_chart(plot_menu_avg(df, rest), use_container_width=True)

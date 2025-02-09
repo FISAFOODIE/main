@@ -1,7 +1,14 @@
 # 점메츄: 우리만의 메뉴 리뷰 플랫폼
 
-##  Site
- https://fisafoodie.streamlit.app/
+##  <a href="https://fisafoodie.streamlit.app/" style="text-decoration: none; color: #0066cc; font-weight: bold;"> Site
+
+  <div style="text-align: center;">
+    <img width="300" alt="image" src="https://github.com/user-attachments/assets/048302a4-997f-47ce-9ab3-7730c60d1b9b" />
+    <p style="font-size: 18px; font-family: Arial, sans-serif; color: #333; margin-top: 10px;">
+        Yes, get this app back up! 을 눌러주세요! 
+    </p>
+</div>
+
 
 
 ## ⚒️ Tools
